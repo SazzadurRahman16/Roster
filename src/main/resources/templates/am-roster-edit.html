@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Edit AM roster')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main class="narrow">
+  <h1 th:text="'Edit ' + ${#temporals.format(date, 'EEEE, d MMMM yyyy')}">Edit day</h1>
+  <form th:action="@{/am/roster/{d}(d=${date})}" th:object="${form}" method="post">
+    <fieldset>
+      <legend>Day type</legend>
+      <label class="check" th:each="t : ${dayTypes}">
+        <input type="radio" th:field="*{dayType}" th:value="${t}"> <span th:text="${t.label}">Type</span>
+      </label>
+      <p class="muted">Holiday and "all present" days keep no assignments. Saturday duty keeps only the Roster Duty officer.</p>
+    </fieldset>
+    <fieldset th:each="s : ${slots}">
+      <legend><span th:text="${s.label}">Slot</span> <small th:text="${s.timeRange}">time</small></legend>
+      <label class="check" th:each="e : ${staff}">
+        <input type="checkbox" th:field="*{__${#strings.toLowerCase(s.name())}__}" th:value="${e.id}">
+        <span th:text="${e.displayName}">Name</span>
+      </label>
+    </fieldset>
+    <div class="actions">
+      <button class="btn" type="submit">Save roster</button>
+      <a class="btn ghost" th:href="@{/am/roster(month=${#temporals.format(date, 'yyyy-MM')})}">Cancel</a>
+    </div>
+  </form>
+</main>
+</body>
+</html>

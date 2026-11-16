@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Sign in')}"></head>
+<body class="login">
+<main class="narrow card">
+  <h1>Technology Operations Center</h1>
+  <p class="muted">Admin sign in. The roster itself is open to everyone without a login.</p>
+  <p th:if="${param.error}" class="err">Incorrect username or password.</p>
+  <p th:if="${param.logout}" class="flash">You have been signed out.</p>
+  <form th:action="@{/login}" method="post" class="stack">
+    <label>Username <input type="text" name="username" autofocus required></label>
+    <label>Password <input type="password" name="password" required></label>
+    <button class="btn" type="submit">Sign in</button>
+  </form>
+  <p><a th:href="@{/roster}">View roster without signing in</a></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Team member')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main class="narrow">
+  <h1 th:text="${member.id == null} ? 'Add team member' : 'Edit team member'">Team member</h1>
+  <form th:action="@{/am/team}" th:object="${member}" method="post" class="stack">
+    <input type="hidden" th:field="*{id}">
+    <input type="hidden" th:field="*{active}">
+    <label>Name <input type="text" th:field="*{name}">
+      <span class="err" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span></label>
+    <label>Mobile number (optional) <input type="text" th:field="*{mobile}" inputmode="numeric">
+      <span class="err" th:if="${#fields.hasErrors('mobile')}" th:errors="*{mobile}"></span></label>
+    <label>IP extension (optional) <input type="text" th:field="*{ipExt}"></label>
+    <label class="check"><input type="checkbox" th:field="*{era}"> ERA member (shown as "(ERA)" in the roster)</label>
+    <div class="actions">
+      <button class="btn" type="submit">Save team member</button>
+      <a class="btn ghost" th:href="@{/am/team}">Cancel</a>
+    </div>
+  </form>
+</main>
+</body>
+</html>

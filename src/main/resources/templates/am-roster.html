@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Application Management roster')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+  <p th:if="${message}" class="flash" th:text="${message}"></p>
+
+  <section class="now" aria-label="On duty now">
+    <h2>Application Management: on duty now</h2>
+    <p th:if="${onDuty.type.name() == 'HOLIDAY'}" class="muted">Today is a holiday.</p>
+    <p th:if="${onDuty.type.name() == 'ALL_PRESENT'}" class="muted">All team members are present today.</p>
+    <p th:if="${onDuty.type.name() == 'WORKING' and #maps.isEmpty(onDuty.slots)}" class="muted">No duty slot is running at this moment.</p>
+    <div class="now-grid">
+      <div th:each="entry : ${onDuty.slots}">
+        <h3 th:text="${onDuty.type.name() == 'SATURDAY_DUTY'} ? 'Saturday duty' : ${entry.key.label}">Slot</h3>
+        <p th:text="${entry.value.isEmpty()} ? 'Nobody assigned' : ${#strings.listJoin(entry.value.![displayName], ' & ')}">Names</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="month-nav">
+    <a class="btn" th:href="@{/am/roster(month=${prev})}">&larr; <span th:text="${prev}">prev</span></a>
+    <h1 th:text="'Duty roster: ' + ${#temporals.format(month.atDay(1), 'MMMM yyyy')}">Duty roster</h1>
+    <a class="btn" th:href="@{/am/roster(month=${next})}"><span th:text="${next}">next</span> &rarr;</a>
+    <a class="btn ghost" th:href="@{/am/roster/export(month=${month})}">Export CSV</a>
+    <button class="btn ghost" onclick="window.print()">Print</button>
+  </div>
+
+  <div class="table-wrap">
+    <table class="roster am">
+      <thead>
+        <tr>
+          <th>SL</th><th>Date</th><th>Day</th>
+          <th th:each="s : ${slots}"><span th:text="${s.label}">Slot</span><small th:text="${s.timeRange}">time</small></th>
+          <th class="noprint" sec:authorize="hasRole('ADMIN')"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="row, st : ${rows}" th:classappend="${row.cssClass + (row.date == today ? ' today' : '')}">
+          <td th:text="${#numbers.formatInteger(st.count, 2)}">01</td>
+          <td th:text="${#temporals.format(row.date, 'd-MMM-yyyy')}">1-Nov-2026</td>
+          <td th:text="${#temporals.format(row.date, 'EEEE')}">Sunday</td>
+          <th:block th:switch="${row.type.name()}">
+            <td th:case="'HOLIDAY'" colspan="3" class="span">HOLIDAY</td>
+            <td th:case="'ALL_PRESENT'" colspan="3" class="span">ALL APPLICATION MANAGEMENT TEAM MEMBERS PRESENT FOR MONTH END</td>
+            <td th:case="'SATURDAY_DUTY'" colspan="3" class="span"
+                th:text="${row.rosterText.isEmpty()} ? 'Unassigned' : ${row.rosterText}">Name</td>
+            <th:block th:case="*">
+              <td th:text="${row.rosterText}">Roster</td>
+              <td th:text="${row.additionalText}">Additional</td>
+              <td th:text="${row.replacementText}">Replacement</td>
+            </th:block>
+          </th:block>
+          <td class="noprint" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/am/roster/{d}/edit(d=${row.date})}">Edit</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="info">
+    <div>
+      <h2>Escalation matrix</h2>
+      <ol class="escalation">
+        <li th:each="c : ${escalations}">
+          <strong th:text="${c.name}">Name</strong>
+          <span th:if="${c.title}" th:text="${c.title}">Role</span>
+          <span th:if="${c.phone}" th:text="${c.phone}">Phone</span>
+        </li>
+      </ol>
+    </div>
+    <div>
+      <h2>Legend</h2>
+      <p><span class="chip off">Holiday</span> <span class="chip sat">Saturday duty</span>
+         <span class="chip allin">All present</span></p>
+      <p class="muted">(ERA) marks ERA team members.</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

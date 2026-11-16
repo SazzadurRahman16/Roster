@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Branch-wise officers')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+  <p th:if="${message}" class="flash" th:text="${message}"></p>
+  <div class="month-nav">
+    <h1>Branch-wise assigned officers</h1>
+    <form method="get" th:action="@{/am/branches}" class="search">
+      <input type="text" name="q" th:value="${q}" placeholder="Branch code or name" aria-label="Search branches">
+      <button class="btn" type="submit">Search</button>
+      <a class="btn ghost" th:if="${!q.isEmpty()}" th:href="@{/am/branches}">Clear</a>
+    </form>
+  </div>
+
+  <!-- search results -->
+  <div th:if="${results != null}" class="table-wrap">
+    <table class="roster left">
+      <thead><tr><th>Code</th><th>Branch</th><th>Primary</th><th>Secondary</th></tr></thead>
+      <tbody>
+        <tr th:each="b : ${results}">
+          <td th:text="${b.code} ?: '-'">003</td>
+          <td th:text="${b.name}">Branch</td>
+          <td><span th:replace="~{fragments :: officer(${b.group.primary})}"></span></td>
+          <td><span th:replace="~{fragments :: officer(${b.group.secondary})}"></span></td>
+        </tr>
+        <tr th:if="${results.isEmpty()}"><td colspan="4" class="muted">No branch matches your search.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- grouped view -->
+  <div th:if="${groups != null}" class="card-grid">
+    <article th:each="g : ${groups}" class="group-card">
+      <header>
+        <div><small>Primary</small><span th:replace="~{fragments :: officer(${g.group.primary})}"></span></div>
+        <div><small>Secondary</small>
+          <span th:replace="~{fragments :: officer(${g.group.secondary})}"></span>
+          <span th:if="${g.group.secondary == null}" class="muted">None</span></div>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/am/branches/groups/{id}/edit(id=${g.group.id})}">Manage</a>
+      </header>
+      <table class="roster left compact">
+        <thead><tr><th>BR-CD</th><th>Branch name</th></tr></thead>
+        <tbody>
+          <tr th:each="b : ${g.branches}"><td th:text="${b.code} ?: ''">003</td><td th:text="${b.name}">Name</td></tr>
+        </tbody>
+      </table>
+    </article>
+  </div>
+</main>
+</body>
+</html>

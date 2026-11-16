@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' | Bank Asia Roster'">Roster</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:fragment="header" class="topbar">
+  <div class="brand">
+    <strong>Bank Asia Duty Roster</strong>
+    <span>Technology Operations Center &middot; Application Management</span>
+  </div>
+  <nav>
+    <span class="group"><em>TOC</em>
+      <a th:href="@{/roster}">Roster</a>
+      <a th:href="@{/employees}">Team</a>
+    </span>
+    <span class="group"><em>Application Management</em>
+      <a th:href="@{/am/roster}">Roster</a>
+      <a th:href="@{/am/team}">Team</a>
+      <a th:href="@{/am/branches}">Branches</a>
+      <a th:href="@{/am/departments}">Departments</a>
+    </span>
+    <a sec:authorize="isAnonymous()" th:href="@{/login}" class="admin-login">Admin login</a>
+    <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="inline">
+      <button class="link" type="submit">Sign out (<span sec:authentication="name">admin</span>)</button>
+    </form>
+  </nav>
+</header>
+
+<!-- Officer name + contact, used by branch and department pages -->
+<span th:fragment="officer(m)" th:if="${m != null}" class="officer">
+  <strong th:text="${m.name}">Name</strong>
+  <span th:if="${m.mobile}" th:text="${m.mobile}">0133...</span>
+  <span th:if="${m.ipExt}" th:text="'IP:' + ${m.ipExt}">IP:001821</span>
+</span>
+</body>
+</html>

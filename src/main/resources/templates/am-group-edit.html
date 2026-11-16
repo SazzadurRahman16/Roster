@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Manage branch group')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main class="narrow">
+  <p th:if="${message}" class="flash" th:text="${message}"></p>
+  <h1 th:text="'Manage ' + ${view.group.label}">Group</h1>
+
+  <form th:action="@{/am/branches/groups/{id}(id=${view.group.id})}" method="post" class="stack">
+    <label>Primary officer
+      <select name="primaryId" required>
+        <option th:each="m : ${staff}" th:value="${m.id}" th:text="${m.name}"
+                th:selected="${m.id == view.group.primary.id}">Name</option>
+      </select></label>
+    <label>Secondary officer
+      <select name="secondaryId">
+        <option value="">None</option>
+        <option th:each="m : ${staff}" th:value="${m.id}" th:text="${m.name}"
+                th:selected="${view.group.secondary != null and m.id == view.group.secondary.id}">Name</option>
+      </select></label>
+    <div class="actions"><button class="btn" type="submit">Save officers</button>
+      <a class="btn ghost" th:href="@{/am/branches}">Back</a></div>
+  </form>
+
+  <h2>Branches in this group</h2>
+  <table class="roster left compact">
+    <tbody>
+      <tr th:each="b : ${view.branches}">
+        <td th:text="${b.code} ?: ''">003</td>
+        <td th:text="${b.name}">Branch</td>
+        <td>
+          <form th:action="@{/am/branches/branch/{id}/delete(id=${b.id})}" method="post" class="inline"
+                onsubmit="return confirm('Remove this branch?')">
+            <button class="link danger" type="submit">Remove</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <form th:action="@{/am/branches/groups/{id}/branches(id=${view.group.id})}" method="post" class="stack add">
+    <h2>Add branch</h2>
+    <label>Branch code <input type="text" name="code" maxlength="10"></label>
+    <label>Branch name <input type="text" name="name" required></label>
+    <div class="actions"><button class="btn" type="submit">Add branch</button></div>
+  </form>
+</main>
+</body>
+</html>

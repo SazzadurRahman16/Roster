@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Application Management team')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+  <p th:if="${message}" class="flash" th:text="${message}"></p>
+  <div class="month-nav">
+    <h1>Application Management team</h1>
+    <a class="btn" sec:authorize="hasRole('ADMIN')" th:href="@{/am/team/new}">Add team member</a>
+  </div>
+  <div class="table-wrap">
+    <table class="roster">
+      <thead><tr><th>Name</th><th>Mobile</th><th>IP ext.</th><th>ERA</th><th>Status</th>
+        <th sec:authorize="hasRole('ADMIN')"></th></tr></thead>
+      <tbody>
+        <tr th:each="m : ${members}" th:classappend="${m.active} ? '' : 'inactive'">
+          <td th:text="${m.name}">Name</td>
+          <td th:text="${m.mobile} ?: '-'">0190...</td>
+          <td th:text="${m.ipExt} ?: '-'">001821</td>
+          <td th:text="${m.era} ? 'Yes' : 'No'">No</td>
+          <td th:text="${m.active} ? 'Active' : 'Inactive'">Active</td>
+          <td sec:authorize="hasRole('ADMIN')" class="row-actions">
+            <a th:href="@{/am/team/{id}/edit(id=${m.id})}">Edit</a>
+            <form th:action="@{/am/team/{id}/active(id=${m.id})}" method="post" class="inline">
+              <input type="hidden" name="value" th:value="${!m.active}">
+              <button class="link" type="submit" th:text="${m.active} ? 'Deactivate' : 'Reactivate'">Toggle</button>
+            </form>
+            <form th:action="@{/am/team/{id}/delete(id=${m.id})}" method="post" class="inline"
+                  onsubmit="return confirm('Remove this team member?')">
+              <button class="link danger" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>

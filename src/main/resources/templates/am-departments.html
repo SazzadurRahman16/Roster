@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Corporate office departments')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+  <p th:if="${message}" class="flash" th:text="${message}"></p>
+  <div class="month-nav"><h1>Corporate office department list</h1></div>
+
+  <div class="card-grid dept">
+    <article th:each="o, st : ${officers}" class="dept-card" th:classappend="'c' + ${st.index % 6}">
+      <header><small>Assigned officer</small><strong th:text="${o.member.name}">Name</strong></header>
+      <ul>
+        <li th:each="d : ${o.departments}">
+          <span th:text="${d.name}">Department</span>
+          <form sec:authorize="hasRole('ADMIN')" th:action="@{/am/departments/{id}/delete(id=${d.id})}"
+                method="post" class="inline" onsubmit="return confirm('Remove this department?')">
+            <button class="link danger" type="submit" aria-label="Remove department">&times;</button>
+          </form>
+        </li>
+      </ul>
+    </article>
+  </div>
+
+  <form sec:authorize="hasRole('ADMIN')" th:action="@{/am/departments}" method="post" class="stack add narrow-form">
+    <h2>Assign a department</h2>
+    <label>Department / division <input type="text" name="name" required></label>
+    <label>Assigned officer
+      <select name="memberId" required>
+        <option th:each="m : ${staff}" th:value="${m.id}" th:text="${m.name}">Name</option>
+      </select></label>
+    <div class="actions"><button class="btn" type="submit">Assign</button></div>
+  </form>
+</main>
+</body>
+</html>
